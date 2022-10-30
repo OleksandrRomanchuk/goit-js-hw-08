@@ -8,13 +8,11 @@ import throttle from 'lodash.throttle';
 const FORM_SELECTOR = '.feedback-form';
 const LOCAL_ST_KEY = 'feedback-form-state';
 const loginForm = document.querySelector(FORM_SELECTOR);
-let formData = createEmptyDataObj();
 
 if (loadDataFromLocalSt(LOCAL_ST_KEY)) {
   Object.keys(loadDataFromLocalSt(LOCAL_ST_KEY)).map(key => {
     if (loginForm[key]) {
-      formData[key] = loginForm[key].value =
-        loadDataFromLocalSt(LOCAL_ST_KEY)[key];
+      loginForm[key].value = loadDataFromLocalSt(LOCAL_ST_KEY)[key];
     }
   });
 }
@@ -27,13 +25,19 @@ function onFormSubmit(event) {
 
   if (!formFieldsValidation(loginForm)) return;
 
+  const formData = [...event.target].reduce((dataObj, { name }) => {
+    if (name) {
+      dataObj[name] = event.target.elements[name].value;
+    }
+
+    return dataObj;
+  }, {});
+
   console.log(formData);
   //   console.log(loadDataFromLocalSt(LOCAL_ST_KEY));
 
   removeDataFromLocalSt(LOCAL_ST_KEY);
   event.target.reset();
-
-  formData = createEmptyDataObj();
 }
 
 function formFieldsValidation(form) {
@@ -54,19 +58,17 @@ function formFieldsValidation(form) {
 }
 
 function onFormInput(event) {
-  formData[event.target.name] = event.target.value;
+  if (event.currentTarget) {
+    const formData = [...event.currentTarget].reduce((dataObj, { name }) => {
+      if (name) {
+        dataObj[name] = event.currentTarget[name].value;
+      }
 
-  saveDataToLocalSt(LOCAL_ST_KEY, formData);
-}
+      return dataObj;
+    }, {});
 
-function createEmptyDataObj() {
-  return [...loginForm].reduce((dataObj, { name }) => {
-    if (name) {
-      dataObj[name] = '';
-    }
-
-    return dataObj;
-  }, {});
+    saveDataToLocalSt(LOCAL_ST_KEY, formData);
+  }
 }
 
 // removeDataFromLocalSt(LOCAL_ST_KEY);
