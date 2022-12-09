@@ -3,12 +3,12 @@ import {
   loadDataFromLocalSt,
   removeDataFromLocalSt,
 } from './local-st-func';
-import throttle from 'lodash.throttle';
+import throttle from '../../node_modules/lodash.throttle';
 
 const FORM_SELECTOR = '.feedback-form';
 const LOCAL_ST_KEY = 'feedback-form-state';
 const loginForm = document.querySelector(FORM_SELECTOR);
-let formData = createEmptyDataObj();
+let formData = createEmptyDataObj(loginForm);
 
 if (loadDataFromLocalSt(LOCAL_ST_KEY)) {
   Object.keys(loadDataFromLocalSt(LOCAL_ST_KEY)).map(key => {
@@ -59,8 +59,8 @@ function onFormInput(event) {
   saveDataToLocalSt(LOCAL_ST_KEY, formData);
 }
 
-function createEmptyDataObj() {
-  return [...loginForm].reduce((dataObj, { name }) => {
+function createEmptyDataObj(form) {
+  return [...form].reduce((dataObj, { name }) => {
     if (name) {
       dataObj[name] = '';
     }
